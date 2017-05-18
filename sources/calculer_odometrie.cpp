@@ -16,11 +16,20 @@ eQEP eqep1(eQEP1, eQEP::eQEP_Mode_Absolute, 1);
 eQEP eqep2(eQEP2, eQEP::eQEP_Mode_Absolute, 2);
 
 //Constantes et variables
-const float e=180.0;   //Ecartement des roues codeuses (en mm)
+const float e=260.0;   //Ecartement des roues codeuses (en mm)
 const float N1=1823;  //Nombre d'incréments par tour des codeurs
 const float N2=1818;
-const float p1=0.0861423221; //Ajustes a la main. Pas du codeur 1, theoriquement p=0,034910948 mm/incrémement
-const float p2=0.08635254365;; //Pas du codeur 2
+/*
+const float p1=0.0861423221*3/2; //Ajustes a la main. Pas du codeur 1, theoriquement p=0,034910948 mm/incrémement
+const float p2=0.08635254365*3/2; //Pas du codeur 2
+
+*/
+
+// Nouvelles valeurs 2017
+const float p1=0.151837230 *0.885; //Ajustes a la main. Pas du codeur 1, theoriquement p=0,034910948 mm/incrémement
+const float p2=0.143864192 *0.885; //Pas du codeur 2
+
+
 float n1, n2;          //Nombre d'increments sur chacune des roues produits depuis la dernière lecture
 float dx, dy, dtheta, w1, w2, dtheta1, dtheta2;
 std::mutex mutProtectionEcriture;
@@ -32,7 +41,6 @@ void calculer_odometrie(float tab[9], float Te)
 {
 	//tab = [x, y, alpha, thetag, wg, thetad, wd]
 
-
 	//Lecture des increments produits depuis la derniere lecture
 	n1 = eqep1.get_position(false); // droit
 	n2 = eqep2.get_position(false);// gauche
@@ -41,8 +49,9 @@ void calculer_odometrie(float tab[9], float Te)
 
 	eqep1.set_position(0);           //Raz des registres contenant les nombres d'increments
 	eqep2.set_position(0);
-	//std::cout << "n1 : " << n1 << std::endl;
-	//std::cout << "n2 : " << n2 << std::endl;
+
+	std::cout << "total_increment_1 : " << total_increment_1 << std::endl;
+	std::cout << "total_increment_2 : " << total_increment_2 << std::endl;
 
 	//Position du robot
 	dtheta = (p2*n2-p1*n1)/e;                     //Calcul de la variation d'orientation en rad

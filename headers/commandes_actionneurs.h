@@ -2,12 +2,13 @@
 #define COMMANDES_ACTIONNEURS_H
 
 /*//// 2017 !!! /////////////////////////////*/
+void initialiser_actionneurs(int tab_capteurs[12]);
 
-void descendre_pince();
-void monter_pince());
+void descendre_pince(int tab_capteurs[12]);
+void monter_pince(int tab_capteurs[12]);
 
-void descendre_plaque();
-void monter_plaque();
+void descendre_plaque(int tab_capteurs[12]);
+void monter_plaque(int tab_capteurs[12]);
 
 void basculer_cylindre_bas ();
 void redresser_bascule_bas ();
@@ -16,9 +17,13 @@ void basculer_cylindre_haut ();
 void redresser_bascule_haut();
 
 void deposer_cylindre ();
-void recuperer_boules ();
+void recuperer_boules (int tab_capteurs[12]);
 
 void funnyAction2017 ();
+
+void ouvrir_pince ();
+void fermer_pince();
+
 
 /*///// ANNEE DERNIERE //////////////////////
 

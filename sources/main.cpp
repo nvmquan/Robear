@@ -29,6 +29,8 @@ int main()
 
     while (valCapteur[7]==1) {
         receptionserie(valCapteur);
+
+        //  cout<<"attente tirette"<<endl;
         //        debug:
         //        cout<<"capteur départ: "<<valCapteur[6]<<endl;
         //        this_thread::sleep_for(chrono::milliseconds(500));
@@ -41,7 +43,8 @@ int main()
     this_thread::sleep_for(chrono::seconds(90));
     comMotDroit(0);
     comMotGauche(0);
-    funnyAction2017();
+    cout<<"Lancement de la funny action"<<endl;
+    funnyAction2017() ;
 
 
     return 0;

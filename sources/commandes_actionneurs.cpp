@@ -13,29 +13,49 @@ using namespace std;
 
 /*////////////// FONCTIONS PRIMAIRES ////////////////////*/
 
-
-void descendre_pince ()
+void descendre_pince (int tab_capteurs[12]) // OK
 {
+
+    // Prévue  pour utiliser lorsque pince haut
+
       cout << "\n Je commence à descendre la pince."<< endl;
   receptionserie(tab_capteurs);
-  comPouPince(-90);		// On commande le moteur tant qu'on est pas en but�e
 
-  while ( (tab_capteurs[4] == 0))
+  // Mi ouverture
+  servo(1,60) ;
+
+  // Descendre pince
+  comPouPince(-100);		// On commande le moteur tant qu'on est pas en but�e
+
+
+  while(tab_capteurs[4]==0)
   {
     receptionserie(tab_capteurs);
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
-
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)(20)));
   }
+// // Attendre 3.6s
+//   std::this_thread::sleep_for(std::chrono::milliseconds((int)(3600))); //Pause pour liberer thread avant de re-tester
 
+// Arrêt
   comPouPince(0);
 
   cout << "J'ai fini de descendre la pince."<< endl;
 }
 
-void monter_pince ()
+
+
+
+
+void monter_pince (int tab_capteurs[12]) // OK
 {
 		cout << "\n Je commence à monter la pince."<< endl;
-	receptionserie(tab_capteurs);
+
+	receptionserie(tab_capteurs); // Ned valeur avant de rentrer dans la boucle while
+
+  servo(1,150) ; // Serrer pince
+
+  std::this_thread::sleep_for(std::chrono::milliseconds((int)(1000)));
+
 	comPouPince(100);		// On commande le moteur tant qu'on est pas en but�e
 
 	while ( (tab_capteurs[3] == 0))
@@ -49,33 +69,44 @@ comPouPince(0);
 cout << "J'ai fini de monter la pince."<< endl;
 }
 
-void descendre_plaque ()
+
+
+
+void descendre_plaque (int tab_capteurs[12])
 {
 		cout << "\n Je commence à descendre la plaque."<< endl;
 		receptionserie(tab_capteurs);
 		comPouPlaque(-90);		// On commande le moteur tant qu'on est pas en but�e
 
-		while ( (tab_capteurs[6] == 0))
-		{
-			receptionserie(tab_capteurs);
-			std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
-		}
+
+
+		 while ( (tab_capteurs[6] == 0))
+		 {
+		 	receptionserie(tab_capteurs);
+		 	std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
+		 }
+
+
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)(2000))); //Pause pour liberer thread avant de re-tester
 
 		comPouPlaque(0);
 
 		cout << "J'ai fini de descendre la plaque."<< endl;
 }
 
-void monter_plaque ()
+
+
+
+void monter_plaque (int tab_capteurs[12]) // OK
 {
 	cout << "\n Je commence à monter la plaque."<< endl;
   receptionserie(tab_capteurs);
-  comPouPlaque(100);		// On commande le moteur tant qu'on est pas en but�e
+  comPouPlaque(100);
 
   while ( (tab_capteurs[5] == 0))
   {
-    receptionserie(tab_capteurs);
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
+     receptionserie(tab_capteurs);
+     std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
   }
 
   comPouPlaque(0);
@@ -85,12 +116,12 @@ void monter_plaque ()
 
 void ouvrir_pince ()
 {
-		servo(1, 30);
+		servo(1, 0);
 }
 
-void fermer_pince ()
+void fermer_pince () // OK
 {
-		servo(1, 0);
+		servo(1, 150);
 }
 
 void basculer_cylindre_bas ()
@@ -112,6 +143,8 @@ void basculer_cylindre_haut ()
 {
     for(int i = 1; i < 11; i++){
       servo(2, 40+6*i);
+      std::this_thread::sleep_for(std::chrono::milliseconds((int)(50)));
+
     }
 }
 
@@ -119,17 +152,17 @@ void basculer_cylindre_haut ()
 
 void deposer_cylindre ()
 {
-		basculer_cylindre ();
-		std::this_thread::sleep_for(std::chrono::milliseconds((int)(250)));
-		redresser_bascule ();
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)(250)));
+		basculer_cylindre_bas ();
+		std::this_thread::sleep_for(std::chrono::milliseconds((int)(500)));
+		redresser_bascule_bas ();
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)(500)));
 }
 
-void recuperer_boules ()
+void recuperer_boules (int tab_capteurs[12])
 {
-		descendre_plaque ();
+		descendre_plaque (tab_capteurs);
 		std::this_thread::sleep_for(std::chrono::milliseconds((int)(250)));
-		monter_plaque ();
+		monter_plaque (tab_capteurs);
     std::this_thread::sleep_for(std::chrono::milliseconds((int)(250)));
 }
 
@@ -144,16 +177,11 @@ void initialiser_actionneurs(int tab_capteurs[12])
 {
 	cout << "Initialisation des bras en cours."<< endl;
 
-//  rentrer_bras_poisson_gauche (tab_capteurs);
-	fermer_pince ();
-	monter_pince ();
-	monter_plaque ();
+  fermer_pince ();
+	monter_pince (tab_capteurs);
+	monter_plaque (tab_capteurs);
 	redresser_bascule_bas ();
 
-  //fermer_bras_poisson_gauche ();
-	//fermer_bras_poisson_droit ();
-  //fermer_parasol ();
-  //rentrer_support_parasol ();
 	this_thread::sleep_for(chrono::milliseconds(500));  //Temps que les actionneurs se mettent en place
 
 	cout << "\n Initialisation des bras terminée."<< endl;

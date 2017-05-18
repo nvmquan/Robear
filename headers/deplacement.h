@@ -9,9 +9,6 @@
 #ifndef __test_asservissement__thread_ligne_droite__
 #define __test_asservissement__thread_ligne_droite__
 
-
-
-
 void calculerAngleEtdistance(float tab_odometrie [],float xDesire,float yDesire,float* d,float* angle);
 
 void  asserTourner (float angleDemande, float vitesseDemande, int sens, float tab_odometrie[], int val_capteurs[]);

@@ -17,6 +17,6 @@
 // Limite à cette plage sinon.
 bool comMotDroit(int val);
 bool comMotGauche(int val);
-bool comMotBrasGauche(int val);
-bool comMotBrasDroit(int val);
+bool comPouPince(int val);
+bool comPouPlaque(int val);
 #endif /* defined(__communicationserie__comMoteur__) */

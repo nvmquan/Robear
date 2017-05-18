@@ -37,7 +37,7 @@ void detecter (int * sensrobot, int val_capteurs [],float tab_odometrie[])
 {
     //cout<<"sens robot"<<*sensrobot<<endl;
     switch (*sensrobot){
-        case 1 : // Dans le cas ou notre robot part en marche avant
+        case -1 : // Dans le cas ou notre robot part en marche avant
             if (val_capteurs[1]==0)
             {
                 cout<<"robot adverse pris en compte"<<endl;
@@ -73,7 +73,7 @@ void detecter (int * sensrobot, int val_capteurs [],float tab_odometrie[])
                 }
             }
             break;
-            case -1 : // Dans le cas ou notre robot part en marche avant
+            case 1 : // Dans le cas ou notre robot part en marche avant
                 if (val_capteurs[2]==0)
                 {
 

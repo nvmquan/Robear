@@ -21,7 +21,7 @@ using namespace std;
 #define rapportDeRampeRotation 10
 #define conditionArretRotation 3
 #define Te 20
-const float R_Roue_codeuse=(5/2)*0.01;
+const float R_Roue_codeuse=(7.4/2)*0.01;
 
 int cmd_moteur_gauche=0;
 int cmd_moteur_droit=0;
@@ -75,31 +75,44 @@ else{}
         }
   }
 
+
+
   void asserTourner (float angleDemande, float vitesseDemande, int sens, float tab_odometrie [], int val_capteurs[])
   {
-
+    tab_odometrie[2]=0;
+    tab_odometrie[3]=0;
+    tab_odometrie[5]=0;
     float variation_erreur=0;
     float vitesseGauche, vitesseDroite, erreurGauche, erreurDroite,somme_erreurs_droite,somme_erreurs_gauche, erreurd_maitre_esclave, somme_erreurs_maitre_esclave, variation_erreur_gauche,variation_erreur_droite;
     int Kpg, Kig, Kdg, Kpd, Kid, Kdd;
 
-    float coefficient_rampe_decroissant = vitesseDemande/((1.0/3.0)*angleDemande);
-    float coefficient_rampe_croissant=(vitesseDemande-0.3)/((1.0/3.0)*angleDemande);
+    float coefficient_rampe_decroissant = -vitesseDemande/((1.0/3.0)*angleDemande);
+    float coefficient_rampe_croissant=vitesseDemande/((1.0/3.0)*angleDemande);
     extern eQEP eqep1;
     extern eQEP eqep2;
     eqep1.set_position(0);           //Raz des registres contenant les nombres d'increments
     eqep2.set_position(0);
 
-    Kpg=250;
+    Kpg=150; // 250 de base
     Kig=500;
     Kdg=0;
 
-    Kpd=200;
-    Kid=3000;
+    Kpd=100; // 200 de base
+    Kid=3000; // 3000 de base
     Kdd=0;
+    int cmd_moteur_gauche2=0;
+    int cmd_moteur_droit2=0;
 
+    vitesseGauche=0;
+    vitesseDroite=0;
+    erreurGauche=0;
+    erreurDroite=0;
     somme_erreurs_droite=0;
     somme_erreurs_gauche=0;
-
+    erreurd_maitre_esclave=0;
+    somme_erreurs_maitre_esclave=0;
+    variation_erreur_gauche=0;
+    variation_erreur_droite=0;
 
 
     float position_n_moins_1_roue2 = tab_odometrie[5];
@@ -110,17 +123,18 @@ else{}
    float consigneVitesseGauche, consigneVitesseDroite,consigneVitesse;
     consigneVitesseGauche = -vitesseDemande;
     consigneVitesseDroite = vitesseDemande;
+    consigneVitesse=0;
 
     float AngleParcouru=0;
     float erreur_precedente[2]={0,0};
 
     if(angleDemande>0)
     {
-    while(abs(AngleParcouru-angleDemande)>2)
+    while(abs(AngleParcouru-angleDemande)>3)
     {
       if(AngleParcouru<((1.0/3.0)*angleDemande))
       {
-        consigneVitesse = coefficient_rampe_croissant*AngleParcouru+0.3;
+        consigneVitesse = coefficient_rampe_croissant*AngleParcouru +0.1 ;
       }
       else if ((AngleParcouru>((1.0/3.0)*angleDemande)) && (AngleParcouru < ((2.0/3.0)*angleDemande)))
       {
@@ -128,7 +142,7 @@ else{}
       }
       else
       {
-        consigneVitesse=coefficient_rampe_decroissant*(angleDemande-AngleParcouru);
+        consigneVitesse=coefficient_rampe_decroissant*AngleParcouru + 3* vitesseDemande +0.1 ;
       }
 
         consigneVitesseGauche = -consigneVitesse;
@@ -149,6 +163,232 @@ else{}
 	cout<<"position_angulaire"<<tab_odometrie[2]<<endl;
       somme_erreurs_droite +=erreurDroite*Te*0.001;
       somme_erreurs_gauche +=erreurGauche*Te*0.001;
+
+      if (somme_erreurs_gauche >200)
+      {
+        somme_erreurs_gauche=200;
+      }
+      if (somme_erreurs_gauche <-200)
+      {
+        somme_erreurs_gauche=-200;
+      }
+
+      if (somme_erreurs_droite >200)
+      {
+        somme_erreurs_droite=200;
+      }
+      if (somme_erreurs_droite <-200)
+      {
+        somme_erreurs_droite=-200;
+      }
+
+      erreurd_maitre_esclave = vitesseDroite +  vitesseGauche;
+//	cout<<"erreur maitre esclave"<<erreurd_maitre_esclave<<endl;
+      somme_erreurs_maitre_esclave += erreurd_maitre_esclave*Te*0.001;
+
+      variation_erreur_gauche=erreurGauche + erreur_precedente[0];
+      variation_erreur_droite=erreurDroite + erreur_precedente[1];
+
+
+      cmd_moteur_gauche2=ceil(Kpg*erreurGauche+Kig*(somme_erreurs_gauche)+Kdg*variation_erreur_gauche);
+
+      cmd_moteur_droit2=ceil(-cmd_moteur_gauche2-(Kpd*erreurd_maitre_esclave+Kid*(somme_erreurs_maitre_esclave)+Kdd*variation_erreur_droite));
+      cout<<"cmd_mot_droit"<<cmd_moteur_droit2<<endl;
+     cout <<"cmd mot gauche"<<cmd_moteur_gauche2<<endl;
+
+      erreur_precedente[0]=erreurGauche;
+      erreur_precedente[1]=erreurDroite;
+
+      AngleParcouru=(180/M_PI)*(tab_odometrie[2]-orientation_initiale);
+
+      cout<<"Angle Parcouru"<<AngleParcouru<<endl;
+      cout<<"Angle à parcourir"<<angleDemande-AngleParcouru<<endl;
+position_n_moins_1_roue1=tab_odometrie[3];
+position_n_moins_1_roue2=tab_odometrie[5];
+
+      comMotDroit(cmd_moteur_droit2);
+      comMotGauche(cmd_moteur_gauche2);
+
+      calculer_odometrie(tab_odometrie, Te);
+
+      receptionserie(val_capteurs);
+        this_thread::sleep_for(chrono::milliseconds(Te));
+    }
+
+    }
+    else
+    { cout<<tab_odometrie[2]<<endl;
+ 	while(abs(AngleParcouru-angleDemande)>3)
+      {
+/*
+        if(AngleParcouru>((1.0/3.0)*angleDemande))
+        {
+          consigneVitesse =-coefficient_rampe_croissant*(AngleParcouru)+0.3;
+        }
+        else if ((AngleParcouru<((1.0/3.0)*angleDemande)) && (AngleParcouru >((2.0/3.0)*angleDemande)))
+        {
+          consigneVitesse = vitesseDemande;
+        }
+        else
+        {
+          consigneVitesse=3*vitesseDemande*(angleDemande-AngleParcouru);
+        }
+*/
+consigneVitesse=vitesseDemande;
+          consigneVitesseGauche = consigneVitesse;
+          consigneVitesseDroite = -consigneVitesse;
+             cout<<"consignevitesse"<<consigneVitesse<<endl;
+        // moteur gauche maitre, moteur droit esclave
+        vitesseGauche = -1000*(tab_odometrie[5]-position_n_moins_1_roue2)*R_Roue_codeuse/Te;
+        vitesseDroite = -1000*(tab_odometrie[3]-position_n_moins_1_roue1)*R_Roue_codeuse/Te;
+
+
+        erreurGauche =consigneVitesseGauche-vitesseGauche;
+        erreurDroite = consigneVitesseDroite-vitesseDroite;
+  //	cout<<"ErreurGauche"<<erreurGauche<<endl;
+  //	cout<<"erreur droite"<<erreurDroite<<endl;
+  	cout<<"position_angulaire"<<tab_odometrie[2]<<endl;
+        somme_erreurs_droite +=erreurDroite*Te*0.001;
+        somme_erreurs_gauche +=erreurGauche*Te*0.001;
+
+        erreurd_maitre_esclave = vitesseDroite +  vitesseGauche;
+  //	cout<<"erreur maitre esclave"<<erreurd_maitre_esclave<<endl;
+        somme_erreurs_maitre_esclave += erreurd_maitre_esclave*Te*0.001;
+
+        variation_erreur_gauche=erreurGauche + erreur_precedente[0];
+        variation_erreur_droite=erreurDroite + erreur_precedente[1];
+
+
+        cmd_moteur_gauche2=ceil(Kpg*erreurGauche+Kig*(somme_erreurs_gauche)+Kdg*variation_erreur_gauche);
+
+        cmd_moteur_droit2=ceil(-cmd_moteur_gauche2-(Kpd*erreurd_maitre_esclave+Kid*(somme_erreurs_maitre_esclave)+Kdd*variation_erreur_droite));
+
+        erreur_precedente[0]=erreurGauche;
+        erreur_precedente[1]=erreurDroite;
+
+        AngleParcouru=(180/M_PI)*(tab_odometrie[2]-orientation_initiale);
+
+        cout<<"Angle Parcouru"<<AngleParcouru<<endl;
+        cout<<"Angle à parcourir"<<angleDemande-AngleParcouru<<endl;
+  position_n_moins_1_roue1=tab_odometrie[3];
+  position_n_moins_1_roue2=tab_odometrie[5];
+
+        comMotDroit(cmd_moteur_droit2);
+        comMotGauche(cmd_moteur_gauche2);
+
+        calculer_odometrie(tab_odometrie, Te);
+
+        receptionserie(val_capteurs);
+        //detecter(&sens, val_capteurs, tab_odometrie);
+          this_thread::sleep_for(chrono::milliseconds(Te));
+      }
+
+    }
+
+    comMotDroit(0);
+    comMotGauche(0);
+
+
+  }
+
+
+
+
+  void asserTourner2 (float angleDemande, float vitesseDemande, int sens, float tab_odometrie [], int val_capteurs[])
+  {
+
+    float variation_erreur=0;
+    float vitesseGauche, vitesseDroite, erreurGauche, erreurDroite,somme_erreurs_droite,somme_erreurs_gauche, erreurd_maitre_esclave, somme_erreurs_maitre_esclave, variation_erreur_gauche,variation_erreur_droite;
+    int Kpg, Kig, Kdg, Kpd, Kid, Kdd;
+
+    float coefficient_rampe_decroissant = -vitesseDemande/((1.0/3.0)*angleDemande);
+    float coefficient_rampe_croissant=vitesseDemande/((1.0/3.0)*angleDemande);
+    extern eQEP eqep1;
+    extern eQEP eqep2;
+    eqep1.set_position(0);           //Raz des registres contenant les nombres d'increments
+    eqep2.set_position(0);
+
+    Kpg=150; // 250 de base
+    Kig=500;
+    Kdg=0;
+
+    Kpd=100; // 200 de base
+    Kid=3000; // 3000 de base
+    Kdd=0;
+
+    somme_erreurs_droite=0;
+    somme_erreurs_gauche=0;
+
+
+
+    float position_n_moins_1_roue2 = tab_odometrie[5];
+    float position_n_moins_1_roue1 = tab_odometrie[3];
+    float orientation_initiale=tab_odometrie[2];
+
+
+   float consigneVitesseGauche, consigneVitesseDroite,consigneVitesse;
+    consigneVitesseGauche = -vitesseDemande;
+    consigneVitesseDroite = vitesseDemande;
+
+    float AngleParcouru=0;
+    float erreur_precedente[2]={0,0};
+
+
+
+
+    if(angleDemande>0)
+    {
+    while(abs(AngleParcouru-angleDemande)>1)
+    {
+      if(AngleParcouru<((1.0/3.0)*angleDemande))
+      {
+        consigneVitesse = coefficient_rampe_croissant*AngleParcouru +0.1 ;
+      }
+      else if ((AngleParcouru>((1.0/3.0)*angleDemande)) && (AngleParcouru < ((2.0/3.0)*angleDemande)))
+      {
+        consigneVitesse = vitesseDemande;
+      }
+      else
+      {
+        consigneVitesse=coefficient_rampe_decroissant*AngleParcouru + 3* vitesseDemande +0.1 ;
+      }
+
+        consigneVitesseGauche = -consigneVitesse;
+        consigneVitesseDroite = consigneVitesse;
+
+
+
+
+      // moteur gauche maitre, moteur droit esclave
+      vitesseGauche = -1000*(tab_odometrie[5]-position_n_moins_1_roue2)*R_Roue_codeuse/Te;
+      vitesseDroite = -1000*(tab_odometrie[3]-position_n_moins_1_roue1)*R_Roue_codeuse/Te;
+
+
+      erreurGauche =consigneVitesseGauche-vitesseGauche;
+      erreurDroite = consigneVitesseDroite-vitesseDroite;
+//	cout<<"ErreurGauche"<<erreurGauche<<endl;
+//	cout<<"erreur droite"<<erreurDroite<<endl;
+	cout<<"position_angulaire"<<tab_odometrie[2]<<endl;
+      somme_erreurs_droite +=erreurDroite*Te*0.001;
+      somme_erreurs_gauche +=erreurGauche*Te*0.001;
+
+      if (somme_erreurs_gauche >200)
+      {
+        somme_erreurs_gauche=200;
+      }
+      if (somme_erreurs_gauche <-200)
+      {
+        somme_erreurs_gauche=-200;
+      }
+
+      if (somme_erreurs_droite >200)
+      {
+        somme_erreurs_droite=200;
+      }
+      if (somme_erreurs_droite <-200)
+      {
+        somme_erreurs_droite=-200;
+      }
 
       erreurd_maitre_esclave = vitesseDroite +  vitesseGauche;
 //	cout<<"erreur maitre esclave"<<erreurd_maitre_esclave<<endl;
@@ -180,32 +420,37 @@ position_n_moins_1_roue2=tab_odometrie[5];
       calculer_odometrie(tab_odometrie, Te);
 
       receptionserie(val_capteurs);
-      //detecter(&sens, val_capteurs, tab_odometrie);
         this_thread::sleep_for(chrono::milliseconds(Te));
     }
 
     }
+
+
+
     else
-    { cout<<tab_odometrie[2]<<endl;
- 	while(abs(AngleParcouru-angleDemande)>2)
-      {/*
-        if(AngleParcouru>((1.0/3.0)*angleDemande))
+    {
+
+      while(abs(AngleParcouru-angleDemande)>1)
+      {
+        if(AngleParcouru<((1.0/3.0)*angleDemande))
         {
-          consigneVitesse =-coefficient_rampe_croissant*(AngleParcouru)+0.3;
+          consigneVitesse = coefficient_rampe_croissant*AngleParcouru +0.1 ;
         }
-        else if ((AngleParcouru<((1.0/3.0)*angleDemande)) && (AngleParcouru >((2.0/3.0)*angleDemande)))
+        else if ((AngleParcouru>((1.0/3.0)*angleDemande)) && (AngleParcouru < ((2.0/3.0)*angleDemande)))
         {
           consigneVitesse = vitesseDemande;
         }
         else
         {
-          consigneVitesse=3*vitesseDemande*(angleDemande-AngleParcouru);
+          consigneVitesse=coefficient_rampe_decroissant*AngleParcouru + 3* vitesseDemande +0.1 ;
         }
-              */
-consigneVitesse=vitesseDemande;
-          consigneVitesseGauche = consigneVitesse;
-          consigneVitesseDroite = -consigneVitesse;
-             cout<<"consignevitesse"<<consigneVitesse<<endl;
+
+          consigneVitesseGauche = -consigneVitesse;
+          consigneVitesseDroite = consigneVitesse;
+
+
+
+
         // moteur gauche maitre, moteur droit esclave
         vitesseGauche = -1000*(tab_odometrie[5]-position_n_moins_1_roue2)*R_Roue_codeuse/Te;
         vitesseDroite = -1000*(tab_odometrie[3]-position_n_moins_1_roue1)*R_Roue_codeuse/Te;
@@ -213,14 +458,14 @@ consigneVitesse=vitesseDemande;
 
         erreurGauche =consigneVitesseGauche-vitesseGauche;
         erreurDroite = consigneVitesseDroite-vitesseDroite;
-  //	cout<<"ErreurGauche"<<erreurGauche<<endl;
-  //	cout<<"erreur droite"<<erreurDroite<<endl;
-  	cout<<"position_angulaire"<<tab_odometrie[2]<<endl;
+      //	cout<<"ErreurGauche"<<erreurGauche<<endl;
+      //	cout<<"erreur droite"<<erreurDroite<<endl;
+      cout<<"position_angulaire"<<tab_odometrie[2]<<endl;
         somme_erreurs_droite +=erreurDroite*Te*0.001;
         somme_erreurs_gauche +=erreurGauche*Te*0.001;
 
         erreurd_maitre_esclave = vitesseDroite +  vitesseGauche;
-  //	cout<<"erreur maitre esclave"<<erreurd_maitre_esclave<<endl;
+      //	cout<<"erreur maitre esclave"<<erreurd_maitre_esclave<<endl;
         somme_erreurs_maitre_esclave += erreurd_maitre_esclave*Te*0.001;
 
         variation_erreur_gauche=erreurGauche + erreur_precedente[0];
@@ -229,7 +474,9 @@ consigneVitesse=vitesseDemande;
 
         cmd_moteur_gauche=ceil(Kpg*erreurGauche+Kig*(somme_erreurs_gauche)+Kdg*variation_erreur_gauche);
 
-        cmd_moteur_droit=ceil(-cmd_moteur_gauche-(Kpd*erreurd_maitre_esclave+Kid*(somme_erreurs_maitre_esclave)-Kdd*variation_erreur_droite));
+        cmd_moteur_droit=ceil(-cmd_moteur_gauche-(Kpd*erreurd_maitre_esclave+Kid*(somme_erreurs_maitre_esclave)+Kdd*variation_erreur_droite));
+        cout<<"cmd_mot_droit"<<cmd_moteur_droit<<endl;
+       cout <<"cmd mot gauche"<<cmd_moteur_gauche<<endl;
 
         erreur_precedente[0]=erreurGauche;
         erreur_precedente[1]=erreurDroite;
@@ -238,8 +485,8 @@ consigneVitesse=vitesseDemande;
 
         cout<<"Angle Parcouru"<<AngleParcouru<<endl;
         cout<<"Angle à parcourir"<<angleDemande-AngleParcouru<<endl;
-  position_n_moins_1_roue1=tab_odometrie[3];
-  position_n_moins_1_roue2=tab_odometrie[5];
+      position_n_moins_1_roue1=tab_odometrie[3];
+      position_n_moins_1_roue2=tab_odometrie[5];
 
         comMotDroit(cmd_moteur_droit);
         comMotGauche(cmd_moteur_gauche);
@@ -247,10 +494,8 @@ consigneVitesse=vitesseDemande;
         calculer_odometrie(tab_odometrie, Te);
 
         receptionserie(val_capteurs);
-        //detecter(&sens, val_capteurs, tab_odometrie);
           this_thread::sleep_for(chrono::milliseconds(Te));
       }
-
     }
 
     comMotDroit(0);
@@ -306,37 +551,45 @@ void ligneDroite(float distance_demande, float vitesseDemande, int sens, float t
   eqep1.set_position(0);           //Raz des registres contenant les nombres d'increments
   eqep2.set_position(0);
 
-  Kpg=250;
-  Kig=500;
+  Kpg=150; // 250 de base
+  Kig=500; //500
   Kdg=0;
 
-  Kpd=200;
-  Kid=3000;
+  Kpd=100; // 200 de base
+  Kid=3000; // 3000
   Kdd=0;
 
+  vitesseGauche=0;
+  vitesseDroite=0;
+  erreurGauche=0;
   somme_erreurs_droite=0;
   somme_erreurs_gauche=0;
+  erreurd_maitre_esclave=0;
+  somme_erreurs_maitre_esclave=0;
+  variation_erreur_gauche=0;
+  variation_erreur_droite=0;
 
-  float coefficient_rampe_decroissant = vitesseDemande/((1.0/3.0)*distance_demande);
-  float coefficient_rampe_croissant=(vitesseDemande-0.3)/((1.0/3.0)*distance_demande);
+  float coefficient_rampe_decroissant = -vitesseDemande/((1.0/3.0)*distance_demande);
+  float coefficient_rampe_croissant=(vitesseDemande)/((1.0/3.0)*distance_demande);
   float position_n_moins_1_roue2 = tab_odometrie[5];
   float position_n_moins_1_roue1 = tab_odometrie[3];
   float x_initial = tab_odometrie[0];
   float y_initial = tab_odometrie[1];
 
-  while(distanceParcourue<distance_demande)
+  while(abs(distanceParcourue-distance_demande)> 0.01)
   {
     if(distanceParcourue<((1.0/3.0)*distance_demande))
     {
-      consigneVitesse = coefficient_rampe_croissant*distanceParcourue+0.3;
+      consigneVitesse = coefficient_rampe_croissant*distanceParcourue + 0.1;
     }
-    else if ((distanceParcourue>((1.0/3.0)*distance_demande)) && (distanceParcourue < ((2.0/3.0)*distance_demande)))
+    else if ((distanceParcourue>((1.0/3.0)*distance_demande)) && (distanceParcourue< ((2.0/3.0)*distance_demande)))
     {
       consigneVitesse = vitesseDemande;
     }
     else
     {
-      consigneVitesse=coefficient_rampe_decroissant*(distance_demande-distanceParcourue);
+      consigneVitesse=coefficient_rampe_decroissant*distanceParcourue + 3* vitesseDemande + 0.1;
+
     }
 
     if(sens==-1)
@@ -356,6 +609,24 @@ void ligneDroite(float distance_demande, float vitesseDemande, int sens, float t
 
     somme_erreurs_droite +=erreurDroite*Te*0.001;
     somme_erreurs_gauche +=erreurGauche*Te*0.001;
+
+    if (somme_erreurs_gauche >200)
+    {
+      somme_erreurs_gauche=200;
+    }
+    if (somme_erreurs_gauche <-200)
+    {
+      somme_erreurs_gauche=-200;
+    }
+
+    if (somme_erreurs_droite >200)
+    {
+      somme_erreurs_droite=200;
+    }
+    if (somme_erreurs_droite <-200)
+    {
+      somme_erreurs_droite=-200;
+    }
 
     erreurd_maitre_esclave = vitesseDroite - vitesseGauche;
     somme_erreurs_maitre_esclave += erreurd_maitre_esclave*Te*0.001;

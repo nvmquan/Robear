@@ -22,10 +22,10 @@ void descendre_pince (int tab_capteurs[12]) // OK
   receptionserie(tab_capteurs);
 
   // Mi ouverture
-  servo(1,60) ;
+  servo(1,70) ;
 
   // Descendre pince
-  comPouPince(-100);		// On commande le moteur tant qu'on est pas en but�e
+  comPouPince(-250);		// On commande le moteur tant qu'on est pas en but�e
 
 
   while(tab_capteurs[4]==0)
@@ -56,7 +56,7 @@ void monter_pince (int tab_capteurs[12]) // OK
 
   std::this_thread::sleep_for(std::chrono::milliseconds((int)(1000)));
 
-	comPouPince(100);		// On commande le moteur tant qu'on est pas en but�e
+	comPouPince(200);		// On commande le moteur tant qu'on est pas en but�e
 
 	while ( (tab_capteurs[3] == 0))
 	{

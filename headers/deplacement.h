@@ -32,6 +32,6 @@ void ligneDroite_fin_course(float distance_demande, float vitesseDemande, int se
 
 // Fonctions BO
 
-void AvancerBO( int commande , int temps);
+void AvancerBO( int commande , int temps, float tab_odometrie[], int val_capteurs[], int detection);
 
 void TournerDroiteBO( int commande , int temps);

@@ -76,12 +76,30 @@ else{}
   }
 
 
-void AvancerBO( int commande , int temps)
+void AvancerBO( int commande , int temps,float tab_odometrie[], int val_capteurs[],int detection)
 {
+  int compteur_temps = 0;
+  int sens=0;
+  if (commande >0)
+  {
+    sens = -1;
+  }
+  else {
+    sens = 1;
+  }
   comMotGauche(-commande);
   comMotDroit(-commande);
+  while (compteur_temps < temps)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    compteur_temps += 1;
+    if (detection == 1)
+    {
+      detecter(&sens, val_capteurs, tab_odometrie);
+    }
+  }
 
-  std::this_thread::sleep_for(std::chrono::milliseconds((int)temps));
+
 
   if(commande > 0 )
 {

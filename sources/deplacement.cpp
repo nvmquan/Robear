@@ -80,13 +80,16 @@ void AvancerBO( int commande , int temps)
 {
   comMotGauche(-commande);
   comMotDroit(-commande);
+  std::this_thread::sleep_for(std::chrono::milliseconds(temps));
 
-  std::this_thread::sleep_for(std::chrono::milliseconds((int)temps));
 
   if(commande > 0 )
 {
   comMotGauche(20);
   comMotDroit(20);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  comMotGauche(0);
+  comMotDroit(0);
 }
 
 
@@ -94,6 +97,9 @@ void AvancerBO( int commande , int temps)
 {
   comMotGauche(-20);
   comMotDroit(-20);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  comMotGauche(0);
+  comMotDroit(0);
 }
   // Fin fonction
 }

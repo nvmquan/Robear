@@ -70,6 +70,11 @@ void monter_pince (int tab_capteurs[12]) // OK
 			receptionserie(tab_capteurs);
 			std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
       compteur_secu_montee += 1;
+      if (compteur_secu_montee >= 150)
+        {
+          cout << "\n - Force Break : capteur au dessus de 150 ms."<<endl;
+          break;
+        }
 	}
 
 comPouPince(0);
@@ -105,19 +110,14 @@ void descendre_plaque (int tab_capteurs[12])
 		receptionserie(tab_capteurs);
 		comPouPlaque(-90);		// On commande le moteur tant qu'on est pas en but�e
 
-
-
 		 while ( (tab_capteurs[6] == 0))
 		 {
 		 	receptionserie(tab_capteurs);
 		 	std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
 		 }
 
-
     std::this_thread::sleep_for(std::chrono::milliseconds((int)(2000))); //Pause pour liberer thread avant de re-tester
-
 		comPouPlaque(0);
-
 		cout << "J'ai fini de descendre la plaque."<< endl;
 }
 

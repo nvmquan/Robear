@@ -21,6 +21,30 @@
 #include "../headers/commandes_actionneurs.h"
 #include "../headers/deplacement.h"
 
+#include <iostream>
+#include <cstdio>
+#include <ctime>
+
+ initialize_timer
+
+
+int duree() {
+  // calcule la duree du match en cours 
+    std::clock_t start;
+    double duration;
+
+    start = std::clock();
+
+    /* Your algorithm here */
+
+    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+
+    std::cout<<"printf: "<< duration <<'\n';
+
+    return duration
+}
+
+
 
 // fonction stratégie pour homologation
 
@@ -28,6 +52,9 @@ using namespace std;
 
 void strategie(int valCapteur[7]){
     int vitesseDeplacement(150),vitesseApproche(100);
+
+    duration = duree()
+
     float tabOdometrie[]={0,0,0,0,0,0,0};
     const float angle1=M_PI/4;
     int sleeping_time = 250;
@@ -36,6 +63,8 @@ void strategie(int valCapteur[7]){
     tabOdometrie[0]=0;
     tabOdometrie[1]=0;
     tabOdometrie[2]=0;
+
+    duration = duree()
 
     //ligneDroite(1, 0.4, -1, tabOdometrie, valCapteur, 1);          //Reculer 242 mm
     //this_thread::sleep_for(chrono::milliseconds(sleeping_time));

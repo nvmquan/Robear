@@ -8,6 +8,7 @@
 #include <time.h>
 #include <cmath>
 
+
 #include "../headers/calculer_odometrie.h"
 #include "../headers/protocole_com_serie.h"
 #include "../headers/eqep.h"
@@ -28,7 +29,14 @@ int main()
     initialiser_actionneurs(valCapteur);
 
     while (valCapteur[7]==1) {
+
+        cout<<"attente tirette"<<endl;
         receptionserie(valCapteur);
+        if valCapteur[7]==1 {
+            cout<<"-- tirette toujours en place"<<endl;
+        else
+            cout<<"-- tirette levée. Le robot va se déplacer"<<endl;
+        }
 
         //  cout<<"attente tirette"<<endl;
         //        debug:

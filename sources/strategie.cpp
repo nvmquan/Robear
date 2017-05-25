@@ -242,7 +242,7 @@ cout<<"Second phase\n"<<endl;
 
 // DEPOSR LES CLINDRES DANS ZONE DE DEPART
 
-    TournerGaucheBO(80,1080);           //Rotation -37°
+    TournerDroiteBO(80,1080);           //Rotation -37°
     this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
     monter_pince(valCapteur);
@@ -280,11 +280,11 @@ cout<<"End of second phase\n"<<endl;
 // //Déplacement vers les rails latérale et dépot du premier cylindre et le deuxieme
 // cout<<"Fifth phase\n"<<endl;
 //
-//     TournerGaucheBO(-80,730);
+//     TournerDroiteBO(-80,730);
 //     this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 //     ligneDroite(0.8, 0.4, -1, tabOdometrie, valCapteur, 0);            //Avancer 800mm
 //     this_thread::sleep_for(chrono::milliseconds(sleeping_time));
-//     TournerGaucheBO(-80,730);
+//     TournerDroiteBO(-80,730);
 //     this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 //     // this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 //     // asserTourner(80, 0.4, 1, tabOdometrie, valCapteur);
@@ -510,7 +510,7 @@ cout<<"End of tenth phase\n"<<endl;
           asserTourner(40, 0.3, 1, tabOdometrie, valCapteur);            //Rotation -55°
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.26, 0.3, 1, tabOdometrie, valCapteur, 0);          //Reculer 360 mm
+          ligneDroite(0.22, 0.3, 1, tabOdometrie, valCapteur, 0);          //Reculer 360 mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           asserTourner(-41, 0.3, 1, tabOdometrie, valCapteur);            //Rotation 55°
@@ -529,13 +529,13 @@ cout<<"End of tenth phase\n"<<endl;
           ouvrir_pince();                                               //grand angle
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.06, 0.4, -1, tabOdometrie, valCapteur, 0);         //Avancer 100mm
+          ligneDroite(0.048, 0.2, -1, tabOdometrie, valCapteur, 0);         //Avancer 100mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           fermer_pince();                                                //Serrer Pince
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.10, 0.4, 1, tabOdometrie, valCapteur, 1);     //Reculer 100mm
+          ligneDroite(0.10, 0.2, 1, tabOdometrie, valCapteur, 1);     //Reculer 100mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           monter_pince(valCapteur);
@@ -558,13 +558,13 @@ cout<<"End of tenth phase\n"<<endl;
           ouvrir_pince();                                               //grand angle
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.1, 0.4, -1, tabOdometrie, valCapteur, 0);         //Avancer 100mm
+          ligneDroite(0.115, 0.2, -1, tabOdometrie, valCapteur, 0);         //Avancer 110mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           fermer_pince();                                                //Serrer Pince
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.1, 0.4, 1, tabOdometrie, valCapteur, 1);     //Reculer 100mm
+          ligneDroite(0.1, 0.2, 1, tabOdometrie, valCapteur, 1);     //Reculer 100mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           monter_pince(valCapteur);
@@ -587,13 +587,13 @@ cout<<"End of tenth phase\n"<<endl;
           ouvrir_pince();                                               //grand angle
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.1, 0.4, -1, tabOdometrie, valCapteur, 0);         //Avancer 100mm
+          ligneDroite(0.11, 0.2, -1, tabOdometrie, valCapteur, 0);         //Avancer 100mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           fermer_pince();                                                //Serrer Pince
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.1, 0.4, 1, tabOdometrie, valCapteur, 1);     //Reculer 100mm
+          ligneDroite(0.1, 0.2, 1, tabOdometrie, valCapteur, 1);     //Reculer 100mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           monter_pince(valCapteur);
@@ -621,25 +621,28 @@ cout<<"End of tenth phase\n"<<endl;
           // fermer_pince();                                                //Serrer Pince
           // this_thread::sleep_for(chrono::milliseconds(sleeping_time));
           //
-          ligneDroite(0.3, 0.4, 1, tabOdometrie, valCapteur, 1);     //Reculer 350mm
+          ligneDroite(0.3, 0.2, 1, tabOdometrie, valCapteur, 1);     //Reculer 350mm
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          monter_pince(valCapteur);
-          this_thread::sleep_for(chrono::milliseconds(sleeping_time));
+          // monter_pince(valCapteur);
+          // this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
           // ouvrir_pince();                                               //grand angle
           // this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
 
       // DEPOSR LES CLINDRES DANS ZONE DE DEPART
-          /*asserTourner(-37, 0.3, 1, tabOdometrie, valCapteur);            //Rotation -37°
+
+          TournerDroiteBO(80,500);           //Rotation -37°
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          ligneDroite(0.30, 0.3, 1, tabOdometrie, valCapteur, 0);          //Reculer 242 mm
+          monter_pince(valCapteur);
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          asserTourner(-90, 0.3, 1, tabOdometrie, valCapteur);            //Rotation -37°
+          deposer_cylindre();
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
+
+
 
           deposer_cylindre();
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
@@ -650,27 +653,8 @@ cout<<"End of tenth phase\n"<<endl;
           deposer_cylindre();
           this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          deposer_cylindre();
-          this_thread::sleep_for(chrono::milliseconds(sleeping_time));
 
-          descendre_pince(valCapteur);
-          this_thread::sleep_for(chrono::milliseconds(sleeping_time)); //faut attendre que la pince soit descendu suffisament
-
-          basculer_cylindre_haut();
-          this_thread::sleep_for(chrono::milliseconds(sleeping_time));
-
-          redresser_bascule_haut();
-          this_thread::sleep_for(chrono::milliseconds(sleeping_time));
-
-          deposer_cylindre();
-          this_thread::sleep_for(chrono::milliseconds(sleeping_time));
-
-      cout<<"End of second phase\n"<<endl;
-
-      */
-
-
-
+/*
       //Déplacement vers les rails latérale et dépot du premier cylindre et le deuxieme
       cout<<"Fifth phase\n"<<endl;
           asserTourner2(-80, 0.4, 1, tabOdometrie, valCapteur);
@@ -758,7 +742,8 @@ cout<<"End of tenth phase\n"<<endl;
 
           deposer_cylindre();
 
-      cout<<"End of sevnth phase\n"<<endl;
+      cout<<"End of sevnth phase\n"<<endl;*/
+
     }
 
 }

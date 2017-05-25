@@ -34,4 +34,4 @@ void ligneDroite_fin_course(float distance_demande, float vitesseDemande, int se
 
 void AvancerBO( int commande , int temps);
 
-void TournerGaucheBO( int commande , int temps);
+void TournerDroiteBO( int commande , int temps);

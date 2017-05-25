@@ -101,7 +101,7 @@ void AvancerBO( int commande , int temps)
 
 
 
-void TournerGaucheBO(int commande , int temps)
+void TournerDroiteBO(int commande , int temps)
 {
   comMotGauche(commande);
   comMotDroit(-commande);

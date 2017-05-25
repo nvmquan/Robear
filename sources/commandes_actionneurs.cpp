@@ -22,7 +22,7 @@ void descendre_pince (int tab_capteurs[12]) // OK
   receptionserie(tab_capteurs);
 
   // Mi ouverture
-  servo(1,50) ;
+  servo(1,60) ;
 
   // Descendre pince
   comPouPince(-250);		// On commande le moteur tant qu'on est pas en but�e

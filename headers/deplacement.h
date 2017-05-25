@@ -28,3 +28,10 @@ void ligneDroite(float distance_demande, float vitesseDemande, int sens, float t
 void ligneDroite_fin_course(float distance_demande, float vitesseDemande, int sens, float tab_odometrie [], int val_capteurs[], int detection);
 
 #endif /* defined(__test_asservissement__thread_ligne_droite__) */
+
+
+// Fonctions BO
+
+void AvancerBO( int commande , int temps);
+
+void TournerGaucheBO( int commande , int temps);

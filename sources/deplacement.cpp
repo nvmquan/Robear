@@ -76,6 +76,44 @@ else{}
   }
 
 
+void AvancerBO( int commande , int temps)
+{
+  comMotGauche(-commande);
+  comMotDroit(-commande);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds((int)temps));
+
+  if(commande > 0 )
+{
+  comMotGauche(20);
+  comMotDroit(20);
+}
+
+
+  if(commande < 0 )
+{
+  comMotGauche(-20);
+  comMotDroit(-20);
+}
+  // Fin fonction
+}
+
+
+
+
+void TournerGaucheBO(int commande , int temps)
+{
+  comMotGauche(commande);
+  comMotDroit(-commande);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds((int)temps));
+
+  comMotGauche(0);
+  comMotDroit(0);
+}
+
+
+
 
   void asserTourner (float angleDemande, float vitesseDemande, int sens, float tab_odometrie [], int val_capteurs[])
   {
@@ -290,11 +328,11 @@ consigneVitesse=vitesseDemande;
   }
 
 
-
-
   void asserTourner2 (float angleDemande, float vitesseDemande, int sens, float tab_odometrie [], int val_capteurs[])
   {
-
+    tab_odometrie[2]=0;
+    tab_odometrie[3]=0;
+    tab_odometrie[5]=0;
     float variation_erreur=0;
     float vitesseGauche, vitesseDroite, erreurGauche, erreurDroite,somme_erreurs_droite,somme_erreurs_gauche, erreurd_maitre_esclave, somme_erreurs_maitre_esclave, variation_erreur_gauche,variation_erreur_droite;
     int Kpg, Kig, Kdg, Kpd, Kid, Kdd;
@@ -314,9 +352,16 @@ consigneVitesse=vitesseDemande;
     Kid=3000; // 3000 de base
     Kdd=0;
 
+    vitesseGauche=0;
+    vitesseDroite=0;
+    erreurGauche=0;
+    erreurDroite=0;
     somme_erreurs_droite=0;
     somme_erreurs_gauche=0;
-
+    erreurd_maitre_esclave=0;
+    somme_erreurs_maitre_esclave=0;
+    variation_erreur_gauche=0;
+    variation_erreur_droite=0;
 
 
     float position_n_moins_1_roue2 = tab_odometrie[5];
@@ -327,16 +372,14 @@ consigneVitesse=vitesseDemande;
    float consigneVitesseGauche, consigneVitesseDroite,consigneVitesse;
     consigneVitesseGauche = -vitesseDemande;
     consigneVitesseDroite = vitesseDemande;
+    consigneVitesse=0;
 
     float AngleParcouru=0;
     float erreur_precedente[2]={0,0};
 
-
-
-
     if(angleDemande>0)
     {
-    while(abs(AngleParcouru-angleDemande)>1)
+    while(abs(AngleParcouru-angleDemande)>3)
     {
       if(AngleParcouru<((1.0/3.0)*angleDemande))
       {
@@ -422,33 +465,28 @@ position_n_moins_1_roue2=tab_odometrie[5];
     }
 
     }
-
-
-
     else
-    {
-
-      while(abs(AngleParcouru-angleDemande)>1)
+    { cout<<tab_odometrie[2]<<endl;
+ 	while(abs(AngleParcouru-angleDemande)>3)
       {
-        if(AngleParcouru<((1.0/3.0)*angleDemande))
+/*
+        if(AngleParcouru>((1.0/3.0)*angleDemande))
         {
-          consigneVitesse = coefficient_rampe_croissant*AngleParcouru +0.1 ;
+          consigneVitesse =-coefficient_rampe_croissant*(AngleParcouru)+0.3;
         }
-        else if ((AngleParcouru>((1.0/3.0)*angleDemande)) && (AngleParcouru < ((2.0/3.0)*angleDemande)))
+        else if ((AngleParcouru<((1.0/3.0)*angleDemande)) && (AngleParcouru >((2.0/3.0)*angleDemande)))
         {
           consigneVitesse = vitesseDemande;
         }
         else
         {
-          consigneVitesse=coefficient_rampe_decroissant*AngleParcouru + 3* vitesseDemande +0.1 ;
+          consigneVitesse=3*vitesseDemande*(angleDemande-AngleParcouru);
         }
-
-          consigneVitesseGauche = -consigneVitesse;
-          consigneVitesseDroite = consigneVitesse;
-
-
-
-
+*/
+consigneVitesse=vitesseDemande;
+          consigneVitesseGauche = consigneVitesse;
+          consigneVitesseDroite = -consigneVitesse;
+            /// cout<<"consignevitesse"<<consigneVitesse<<endl;
         // moteur gauche maitre, moteur droit esclave
         vitesseGauche = -1000*(tab_odometrie[5]-position_n_moins_1_roue2)*R_Roue_codeuse/Te;
         vitesseDroite = -1000*(tab_odometrie[3]-position_n_moins_1_roue1)*R_Roue_codeuse/Te;
@@ -456,14 +494,14 @@ position_n_moins_1_roue2=tab_odometrie[5];
 
         erreurGauche =consigneVitesseGauche-vitesseGauche;
         erreurDroite = consigneVitesseDroite-vitesseDroite;
-      //	cout<<"ErreurGauche"<<erreurGauche<<endl;
-      //	cout<<"erreur droite"<<erreurDroite<<endl;
-      cout<<"position_angulaire"<<tab_odometrie[2]<<endl;
+  //	cout<<"ErreurGauche"<<erreurGauche<<endl;
+  //	cout<<"erreur droite"<<erreurDroite<<endl;
+  	cout<<"position_angulaire"<<tab_odometrie[2]<<endl;
         somme_erreurs_droite +=erreurDroite*Te*0.001;
         somme_erreurs_gauche +=erreurGauche*Te*0.001;
 
         erreurd_maitre_esclave = vitesseDroite +  vitesseGauche;
-      //	cout<<"erreur maitre esclave"<<erreurd_maitre_esclave<<endl;
+  //	cout<<"erreur maitre esclave"<<erreurd_maitre_esclave<<endl;
         somme_erreurs_maitre_esclave += erreurd_maitre_esclave*Te*0.001;
 
         variation_erreur_gauche=erreurGauche + erreur_precedente[0];
@@ -473,8 +511,6 @@ position_n_moins_1_roue2=tab_odometrie[5];
         cmd_moteur_gauche=ceil(Kpg*erreurGauche+Kig*(somme_erreurs_gauche)+Kdg*variation_erreur_gauche);
 
         cmd_moteur_droit=ceil(-cmd_moteur_gauche-(Kpd*erreurd_maitre_esclave+Kid*(somme_erreurs_maitre_esclave)+Kdd*variation_erreur_droite));
-        cout<<"cmd_mot_droit"<<cmd_moteur_droit<<endl;
-       cout <<"cmd mot gauche"<<cmd_moteur_gauche<<endl;
 
         erreur_precedente[0]=erreurGauche;
         erreur_precedente[1]=erreurDroite;
@@ -483,8 +519,8 @@ position_n_moins_1_roue2=tab_odometrie[5];
 
         cout<<"Angle Parcouru"<<AngleParcouru<<endl;
         cout<<"Angle à parcourir"<<angleDemande-AngleParcouru<<endl;
-      position_n_moins_1_roue1=tab_odometrie[3];
-      position_n_moins_1_roue2=tab_odometrie[5];
+  position_n_moins_1_roue1=tab_odometrie[3];
+  position_n_moins_1_roue2=tab_odometrie[5];
 
         comMotDroit(cmd_moteur_droit);
         comMotGauche(cmd_moteur_gauche);
@@ -492,8 +528,10 @@ position_n_moins_1_roue2=tab_odometrie[5];
         calculer_odometrie(tab_odometrie, Te);
 
         receptionserie(val_capteurs);
+        //detecter(&sens, val_capteurs, tab_odometrie);
           this_thread::sleep_for(chrono::milliseconds(Te));
       }
+
     }
 
     comMotDroit(0);
@@ -501,7 +539,6 @@ position_n_moins_1_roue2=tab_odometrie[5];
 
 
   }
-
 
   void deplacement_robot(float xDesire,float yDesire, int val_capteurs[],float tab_odometrie[],int vitesseNominal,int sens){
       int vitesseRotationActuelle=0,intAsservissement[3];

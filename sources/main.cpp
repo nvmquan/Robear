@@ -40,7 +40,7 @@ int main()
     cout<<"début partie,tirette enlevée"<<endl;
 
     thread threadStrategie(strategie,valCapteur);
-    this_thread::sleep_for(chrono::seconds(90));
+    this_thread::sleep_for(chrono::seconds(92));
     comMotDroit(0);
     comMotGauche(0);
     cout<<"Lancement de la funny action"<<endl;

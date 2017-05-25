@@ -17,7 +17,7 @@ void descendre_pince (int tab_capteurs[12]) // OK
 {
 
     // Prévue  pour utiliser lorsque pince haut
-
+    int compteur_secu_descente = 0;
       cout << "\n Je commence à descendre la pince."<< endl;
   receptionserie(tab_capteurs);
 
@@ -25,18 +25,25 @@ void descendre_pince (int tab_capteurs[12]) // OK
   servo(1,60) ;
 
   // Descendre pince
-  comPouPince(-100);		// On commande le moteur tant qu'on est pas en but�e
+  comPouPince(-250);		// On commande le moteur tant qu'on est pas en but�e
 
 
-  while(tab_capteurs[4]==0)
+  while((tab_capteurs[4]==0) && (compteur_secu_descente < 150))
   {
     receptionserie(tab_capteurs);
     std::this_thread::sleep_for(std::chrono::milliseconds((int)(20)));
+    compteur_secu_descente += 1;
   }
 // // Attendre 3.6s
 //   std::this_thread::sleep_for(std::chrono::milliseconds((int)(3600))); //Pause pour liberer thread avant de re-tester
 
 // Arrêt
+  if (compteur_secu_descente >= 150)
+  {
+    fermer_pince();
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)(150)));
+    servo(1,70) ;
+  }
   comPouPince(0);
 
   cout << "J'ai fini de descendre la pince."<< endl;
@@ -49,19 +56,25 @@ void descendre_pince (int tab_capteurs[12]) // OK
 void monter_pince (int tab_capteurs[12]) // OK
 {
 		cout << "\n Je commence à monter la pince."<< endl;
-
+  int compteur_secu_montee = 0;
 	receptionserie(tab_capteurs); // Ned valeur avant de rentrer dans la boucle while
 
   servo(1,150) ; // Serrer pince
 
   std::this_thread::sleep_for(std::chrono::milliseconds((int)(1000)));
 
-	comPouPince(100);		// On commande le moteur tant qu'on est pas en but�e
+	comPouPince(200);		// On commande le moteur tant qu'on est pas en but�e
 
-	while ( (tab_capteurs[3] == 0))
+	while ( (tab_capteurs[3] == 0) && (compteur_secu_montee < 150))
 	{
 			receptionserie(tab_capteurs);
 			std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
+      compteur_secu_montee += 1;
+      if (compteur_secu_montee >= 150)
+        {
+          cout << "\n - Force Break : capteur au dessus de 150 ms."<<endl;
+          break;
+        }
 	}
 
 comPouPince(0);
@@ -71,6 +84,25 @@ cout << "J'ai fini de monter la pince."<< endl;
 
 
 
+void monter_pince_init (int tab_capteurs[12]) // OK
+{
+		cout << "\n Je commence à monter la pince."<< endl;
+	receptionserie(tab_capteurs); // Ned valeur avant de rentrer dans la boucle while
+  servo(1,150) ; // Serrer pince
+
+  std::this_thread::sleep_for(std::chrono::milliseconds((int)(1000)));
+
+	comPouPince(90);		// On commande le moteur tant qu'on est pas en but�e
+
+	while ( tab_capteurs[3] == 0)
+	{
+			receptionserie(tab_capteurs);
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
+	}
+comPouPince(0);
+cout << "J'ai fini de monter la pince."<< endl;
+}
+
 
 void descendre_plaque (int tab_capteurs[12])
 {
@@ -78,19 +110,14 @@ void descendre_plaque (int tab_capteurs[12])
 		receptionserie(tab_capteurs);
 		comPouPlaque(-90);		// On commande le moteur tant qu'on est pas en but�e
 
-
-
 		 while ( (tab_capteurs[6] == 0))
 		 {
 		 	receptionserie(tab_capteurs);
 		 	std::this_thread::sleep_for(std::chrono::milliseconds((int)(20))); //Pause pour liberer thread avant de re-tester
 		 }
 
-
     std::this_thread::sleep_for(std::chrono::milliseconds((int)(2000))); //Pause pour liberer thread avant de re-tester
-
 		comPouPlaque(0);
-
 		cout << "J'ai fini de descendre la plaque."<< endl;
 }
 
@@ -178,7 +205,7 @@ void initialiser_actionneurs(int tab_capteurs[12])
 	cout << "Initialisation des bras en cours."<< endl;
 
   fermer_pince ();
-	monter_pince (tab_capteurs);
+	monter_pince_init (tab_capteurs);
 	monter_plaque (tab_capteurs);
 	redresser_bascule_bas ();
 

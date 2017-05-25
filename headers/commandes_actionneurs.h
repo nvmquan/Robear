@@ -6,6 +6,7 @@ void initialiser_actionneurs(int tab_capteurs[12]);
 
 void descendre_pince(int tab_capteurs[12]);
 void monter_pince(int tab_capteurs[12]);
+void monter_pince_init (int tab_capteurs[12]);
 
 void descendre_plaque(int tab_capteurs[12]);
 void monter_plaque(int tab_capteurs[12]);

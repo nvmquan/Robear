@@ -50,8 +50,8 @@ void calculer_odometrie(float tab[9], float Te)
 	eqep1.set_position(0);           //Raz des registres contenant les nombres d'increments
 	eqep2.set_position(0);
 
-	std::cout << "total_increment_1 : " << total_increment_1 << std::endl;
-	std::cout << "total_increment_2 : " << total_increment_2 << std::endl;
+	//std::cout << "total_increment_1 : " << total_increment_1 << std::endl;
+	//std::cout << "total_increment_2 : " << total_increment_2 << std::endl;
 
 	//Position du robot
 	dtheta = (p2*n2-p1*n1)/e;                     //Calcul de la variation d'orientation en rad

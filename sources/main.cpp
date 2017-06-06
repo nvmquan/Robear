@@ -28,8 +28,14 @@ int main()
     initialiser_actionneurs(valCapteur);
 
     while (valCapteur[7]==1) {
-        receptionserie(valCapteur);
 
+        cout<<"attente tirette"<<endl;
+        receptionserie(valCapteur);
+        if valCapteur[7]==1 {
+            cout<<"-- tirette toujours en place"<<endl;
+        else
+            cout<<"-- tirette levée. Le robot va se déplacer"<<endl;
+        }
         //  cout<<"attente tirette"<<endl;
         //        debug:
         //        cout<<"capteur départ: "<<valCapteur[6]<<endl;

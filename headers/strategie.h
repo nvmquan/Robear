@@ -14,4 +14,7 @@
 
 void strategie(int valCapteur []);
 
+double GetTimeNow(void);
+double CalculerDuree(double start);
+
 #endif /* defined(__homologation__strategie__) */

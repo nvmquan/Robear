@@ -21,6 +21,40 @@
 #include "../headers/commandes_actionneurs.h"
 #include "../headers/deplacement.h"
 
+#include <iostream>
+#include <cstdio>
+#include <ctime>
+
+ float initialize_timer() {
+
+   cout<<"- Fonction pour intialiser le timer" << endl;
+    // Création de la variable qui mesure le temps de départ
+    cout<<"-- Création de la variable qui mesure le temps de départ" << endl;
+     std::clock_t start;
+     // Initialiation de la variable qui mesure le temps de départ
+     cout<<"-- Initialiation de la variable qui mesure le temps de départ" << endl;    
+     start = std::clock();
+   return start ;
+ }
+
+
+int duree() {
+  // calcule la duree du match en cours
+    std::clock_t start;
+    double duration;
+
+    start = std::clock();
+
+    /* Your algorithm here */
+
+    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+
+    std::cout<<"printf: "<< duration <<'\n';
+
+    return duration
+}
+
+
 
 // fonction stratégie pour homologation
 
